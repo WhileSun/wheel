@@ -3,6 +3,7 @@ package glog
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -35,7 +36,8 @@ func (glogConf *GlogConf) run() *logrus.Logger {
 	// 设置日志级别
 	level, err := logrus.ParseLevel(glogConf.LogLevel)
 	if err != nil {
-		fmt.Printf("glog config level [%s] is not support, choose types [panic,fatal,error,warn,info,debug,trace]", glogConf.LogLevel)
+		log.Fatalf("glog config level [%s] is not support, choose types [panic,fatal,error,warn,info,debug,trace]", glogConf.LogLevel)
+		return nil
 	}
 	logger.SetLevel(level)
 	logger.SetReportCaller(true)
@@ -50,13 +52,13 @@ func (glogConf *GlogConf) run() *logrus.Logger {
 	if logType == "file" {
 		src, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 		if err != nil {
-			fmt.Printf("glog Open Src File err %+v", err)
+			log.Fatalf("glog Open Src File err %+v", err)
 		}
 		writer := bufio.NewWriter(src)
 		logger.SetOutput(writer)
 		glogConf.configLocalFileLogger(logger)
 	} else {
-		fmt.Printf("glog config type [%s] is not support, choose types [file]", logType)
+		log.Fatalf("glog config type [%s] is not support, choose types [file]", logType)
 	}
 	return logger
 }
@@ -85,7 +87,7 @@ func (glogConf *GlogConf) configLocalFileLogger(log *logrus.Logger) {
 			rotatelogs.WithRotationTime(time.Duration(rotationTime)*time.Hour), // 日志切割时间间隔
 		)
 		if err != nil {
-			fmt.Printf("glog ailed to create %s log writer: %s", logType, err.Error())
+			log.Fatalf("glog ailed to create %s log writer: %s", logType, err.Error())
 		}
 		return writer
 	}

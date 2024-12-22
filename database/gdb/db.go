@@ -1,7 +1,6 @@
 package gdb
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -53,7 +52,7 @@ func (gdbConf *GdbConf) run() *gorm.DB {
 	} else if dbType == "postgres" {
 		gdbConf.postGreSqlInit()
 	} else {
-		fmt.Printf("gdb config type [%s] is not setting, use [mysql,postgres] \n", dbType)
+		log.Fatalf("gdb config type [%s] is not setting, use [mysql,postgres] \n", dbType)
 		return nil
 	}
 	var newLogger logger.Interface
@@ -81,19 +80,19 @@ func (gdbConf *GdbConf) run() *gorm.DB {
 		Logger:         newLogger,
 	})
 	if err != nil {
-		fmt.Println("gdb gorm conn failed")
+		log.Fatalf("gdb gorm conn failed")
 		return nil
 	}
 	sqlDB, err := conn.DB()
 	if err != nil {
-		fmt.Printf("gdb connect server failed,Error: %s \n", err.Error())
+		log.Fatalf("gdb connect server failed,Error: %s \n", err.Error())
 		return nil
 	}
 	sqlDB.SetMaxIdleConns(gdbConf.MaxIdleConn)  // 空闲进程数
 	sqlDB.SetMaxOpenConns(gdbConf.MaxOpenConn)  // 最大进程数
 	sqlDB.SetConnMaxLifetime(time.Second * 600) // 设置了连接可复用的最大时间
 	if err := sqlDB.Ping(); err != nil {
-		fmt.Printf("gdb ping is failed,Error:%s", err.Error())
+		log.Fatalf("gdb ping is failed,Error:%s", err.Error())
 	}
 	return conn
 }

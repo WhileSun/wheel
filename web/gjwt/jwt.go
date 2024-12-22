@@ -1,7 +1,7 @@
 package gjwt
 
 import (
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -19,7 +19,7 @@ type GjwtConf struct {
 
 func New(gjwtConf GjwtConf) *GjwtConf {
 	if gjwtConf.Secret == "" {
-		fmt.Println("gjwt secret is empty, please check your config")
+		log.Fatalf("gjwt secret is empty, please check your config")
 		return nil
 	}
 	return &gjwtConf
