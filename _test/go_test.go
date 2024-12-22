@@ -3,10 +3,12 @@ package pkg
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/WhileSun/wheel/core/gconfig"
 	"github.com/WhileSun/wheel/core/glog"
 	"github.com/WhileSun/wheel/database/gdb"
+	"github.com/WhileSun/wheel/web/gjwt"
 )
 
 func TestGconfig(t *testing.T) {
@@ -44,4 +46,22 @@ func TestGdb(t *testing.T) {
 	var user ProductList
 	db.Where("name =?", "John").First(&user)
 	fmt.Println(user)
+}
+
+func TestGjwt(t *testing.T) {
+	var gjwtConf gjwt.GjwtConf
+	gconfig.NewLoadFile(&gjwtConf, "./config.yaml")
+	jwt := gjwt.New(gjwtConf)
+	// create token
+	token, _ := jwt.CreateToken(map[string]interface{}{
+		"name": "John",
+	})
+	// parse token
+	res, _ := jwt.ParseToken(token)
+	fmt.Printf("jwt object %+v \n", res)
+
+	time.Sleep(time.Second * 3)
+	// get new token
+	newToken, err := jwt.RefreshToken(token)
+	fmt.Println("newToken", newToken, err)
 }
