@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"fmt"
-	"net/http"
 	"testing"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/WhileSun/wheel/core/gserver"
 	"github.com/WhileSun/wheel/database/gdb"
 	"github.com/WhileSun/wheel/web/gjwt"
+	"github.com/gin-gonic/gin"
 )
 
 func TestGconfig(t *testing.T) {
@@ -69,9 +69,25 @@ func TestGjwt(t *testing.T) {
 }
 
 func TestGserver(t *testing.T) {
+	var glogConf glog.GlogConf
+	gconfig.NewLoadFile(&glogConf, "./config.yaml")
+	logger := glog.New(glogConf)
+
 	var gserverConf gserver.GserverConf
 	gconfig.NewLoadFile(&gserverConf, "./config.yaml")
-	gserver.New(gserverConf).Run(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
-	}))
+	s := gserver.New(gserverConf)
+	// s.SetHttpServer(&http.Server{
+	// 	Addr: ":8080",
+	// })
+	s.SetHttpHandler(func() *gin.Engine {
+		r := gin.New()
+		r.Use(gserver.MiddlewareLogger(logger))
+		r.GET("/test", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message": "test",
+			})
+		})
+		return r
+	}())
+	s.Run()
 }
