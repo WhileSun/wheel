@@ -2,11 +2,13 @@ package pkg
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/WhileSun/wheel/core/gconfig"
 	"github.com/WhileSun/wheel/core/glog"
+	"github.com/WhileSun/wheel/core/gserver"
 	"github.com/WhileSun/wheel/database/gdb"
 	"github.com/WhileSun/wheel/web/gjwt"
 )
@@ -64,4 +66,12 @@ func TestGjwt(t *testing.T) {
 	// get new token
 	newToken, err := jwt.RefreshToken(token)
 	fmt.Println("newToken", newToken, err)
+}
+
+func TestGserver(t *testing.T) {
+	var gserverConf gserver.GserverConf
+	gconfig.NewLoadFile(&gserverConf, "./config.yaml")
+	gserver.New(gserverConf).Run(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, World!"))
+	}))
 }
