@@ -9,6 +9,7 @@ import (
 	"github.com/WhileSun/wheel/core/glog"
 	"github.com/WhileSun/wheel/core/gserver"
 	"github.com/WhileSun/wheel/database/gdb"
+	uresp "github.com/WhileSun/wheel/utils/uResp"
 	"github.com/WhileSun/wheel/web/gjwt"
 	"github.com/gin-gonic/gin"
 )
@@ -83,8 +84,9 @@ func TestGserver(t *testing.T) {
 		r := gin.New()
 		r.Use(gserver.MiddlewareLogger(logger))
 		r.GET("/test", func(c *gin.Context) {
-			c.JSON(200, gin.H{
+			uresp.New(c).JSON(200, "success", gin.H{
 				"message": "test",
+				"a":       "1",
 			})
 		})
 		return r
