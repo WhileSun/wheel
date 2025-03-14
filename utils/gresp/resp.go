@@ -1,4 +1,4 @@
-package uresp
+package gresp
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UrespConf struct {
+type GrespConf struct {
 	ctx *gin.Context
 }
 
@@ -18,14 +18,17 @@ type RespData struct {
 	Time int64       `json:"time"`
 }
 
-func New(req *gin.Context) *UrespConf {
-	return &UrespConf{
+func New(req *gin.Context) *GrespConf {
+	return &GrespConf{
 		ctx: req,
 	}
 }
 
-func (urespConf UrespConf) JSON(code uint, msg string, data interface{}) {
-	urespConf.ctx.JSON(http.StatusOK, &RespData{
+func (grespConf GrespConf) JSON(code uint, msg string, data interface{}) {
+	if data == nil {
+		data = make(map[string]interface{})
+	}
+	grespConf.ctx.JSON(http.StatusOK, &RespData{
 		Code: code,
 		Msg:  msg,
 		Data: data,
